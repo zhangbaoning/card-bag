@@ -16,6 +16,11 @@ public class AESUtilTest {
         String name = "zhangbaoning";
        byte[] encodeStr = DESUtil.encrypt("12345678",name.getBytes(),"encode");
         System.out.println(new String(encodeStr));
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         byte[] decodeStr = DESUtil.encrypt("12345678",encodeStr,"decode");
         System.out.println(new String(decodeStr));
         Assert.assertEquals(name,new String(decodeStr));

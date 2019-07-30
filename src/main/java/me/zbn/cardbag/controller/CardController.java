@@ -2,9 +2,14 @@ package me.zbn.cardbag.controller;
 
 import me.zbn.cardbag.service.CardService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author: zhangbaoning
@@ -12,13 +17,25 @@ import java.io.IOException;
  * @since: JDK 1.8
  * @description: TODO
  */
+@Controller
 public class CardController {
     @Autowired private CardService service;
-    public void uploadCard(String openid,MultipartFile file){
+    @PostMapping("upload")
+    @ResponseBody
+    public Map<String,String> uploadCard(String openid, MultipartFile file){
+
+            Map<String,String> returnMap = new HashMap<>(1);
         try {
-            service.save(openid,file.getBytes());
+            System.out.println(file.getOriginalFilename());
+            String[] fileNameArray = file.getOriginalFilename().split("\\.");
+            String formart = "."+fileNameArray[fileNameArray.length-1];
+            String imgUrl =   service.save(openid+formart,file.getBytes());
+            returnMap.put("imgUrl",imgUrl);
+            service.getBankOCR(file.getBytes());
+
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return returnMap;
     }
 }

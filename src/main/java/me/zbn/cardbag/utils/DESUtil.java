@@ -14,19 +14,25 @@ import java.security.NoSuchAlgorithmException;
  * @description: TODO
  */
 public class DESUtil {
-    public static byte[] encrypt(String key, byte[] fileByte,String method) {
+    public static byte[] encrypt(String key, byte[] fileByte, String method) {
         try {
             byte[] keyBytes = key.getBytes();
             SecretKey secretKey = new SecretKeySpec(keyBytes, "DES");
-            Cipher cipher = Cipher.getInstance("DES");
-            if (EncryptEnum.encode.equals(method)){
+            Cipher cipher = null;
+            synchronized (Cipher.class)
+            {
+                cipher = Cipher.getInstance("DES");
+            }
+            System.out.println(EncryptEnum.encode);
+            if ((EncryptEnum.encode).name().equals(method)) {
                 // 加密
                 cipher.init(Cipher.ENCRYPT_MODE, secretKey);
-            }else if (EncryptEnum.decode.equals(method)){
+            } else if (EncryptEnum.decode.name().equals(method)) {
                 // 解密
                 cipher.init(Cipher.DECRYPT_MODE, secretKey);
             }
-            return cipher.doFinal(fileByte);
+            cipher.update(fileByte);
+            return cipher.doFinal();
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         } catch (Exception e) {
