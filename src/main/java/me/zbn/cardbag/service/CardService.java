@@ -55,7 +55,8 @@ public class CardService {
         return  ocsUtil.upload(fileByte, openid);
 
     }
-    public void getBankOCR(byte[] imgByte){
+    public BankCard getBankOCR(byte[] imgByte){
+        BankCard bankCard = null;
         try {
 
 
@@ -79,12 +80,13 @@ public class CardService {
             BankCardOCRResponse resp = client.BankCardOCR(req);
 
             System.out.println(BankCardOCRRequest.toJsonString(resp));
-            BankCard bankCard =gson.fromJson(BankCardOCRRequest.toJsonString(resp), BankCard.class);
+             bankCard =gson.fromJson(BankCardOCRRequest.toJsonString(resp), BankCard.class);
             bankCardDao.save(bankCard);
             System.out.println(bankCard.toString());
         } catch (TencentCloudSDKException e) {
             e.printStackTrace();
         }
+        return bankCard;
 
     }
     public void save(){
