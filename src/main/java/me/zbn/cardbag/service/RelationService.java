@@ -3,7 +3,11 @@ package me.zbn.cardbag.service;
 import me.zbn.cardbag.dao.RelationDao;
 import me.zbn.cardbag.entity.Relation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
  * @author: zhangbaoning
@@ -20,5 +24,15 @@ public class RelationService {
         relation.setOpenid(openid);
         relation.setUuid(uuid);
         dao.save(relation);
+    }
+    public Relation getByCardNo(String cardNo){
+        Relation relation = new Relation();
+        relation.setCardNo(cardNo);
+
+        Example<Relation> example = Example.of(relation,ExampleMatcher.matching().withMatcher("cardNo", ExampleMatcher.GenericPropertyMatchers.contains()));
+        return dao.findOne(example).get();
+    }
+    public List<Relation> getAll(){
+       return dao.findAll();
     }
 }
