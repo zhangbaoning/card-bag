@@ -1,13 +1,13 @@
 package me.zbn.cardbag.dao;
 
-import me.zbn.cardbag.entity.BankCard;
+import me.zbn.cardbag.entity.Relation;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 /**
  * @author: zhangbaoning
- * @date: 2019/7/30
+ * @date: 2019/7/31
  * @since: JDK 1.8
  * @description: TODO
  */
-public interface BankCardDao extends JpaRepository<BankCard, String> {
+public interface RelationDao extends JpaRepository<Relation,Integer> {
 }

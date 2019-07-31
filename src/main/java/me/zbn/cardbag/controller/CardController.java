@@ -1,12 +1,10 @@
 package me.zbn.cardbag.controller;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 import me.zbn.cardbag.entity.BankCard;
 import me.zbn.cardbag.service.CardService;
+import me.zbn.cardbag.service.RelationService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.json.GsonJsonParser;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -25,25 +23,45 @@ import java.util.UUID;
  */
 @Controller
 public class CardController {
-    @Autowired private CardService service;
+    @Autowired
+    private CardService service;
+    @Autowired
+    private RelationService relationService;
+
     @PostMapping("upload")
     @ResponseBody
-    public Map<String,String> uploadCard(String openid, MultipartFile file){
+    public Map<String, String> uploadCard(String openid, MultipartFile file) {
         Gson gson = new Gson();
-            Map<String,String> returnMap = new HashMap<>(1);
+        Map<String, String> returnMap = new HashMap<>(1);
         try {
-            System.out.println(file.getOriginalFilename());
+            // 获取格式
             String[] fileNameArray = file.getOriginalFilename().split("\\.");
-            String formart = "."+fileNameArray[fileNameArray.length-1];
-            String uuid = UUID.randomUUID().toString().replace("-","");
-            String imgUrl =   service.save(uuid+formart,file.getBytes());
-            returnMap.put("imgUrl",imgUrl);
-            BankCard bankCard = service.getBankOCR(file.getBytes());
-            String bankCardJson = gson.toJson(bankCard);
-            Map bankCardMap = gson.fromJson(bankCardJson,Map.class);
-            bankCardMap.remove("id");
-            returnMap.putAll(bankCardMap);
+            String formart = "." + fileNameArray[fileNameArray.length - 1];
+            // 生成文件名
+            String uuid = UUID.randomUUID().toString().replace("-", "");
 
+            //  OCR获取卡号 查询卡号 是否保存
+            BankCard bankCard = service.getBankOCR(file.getBytes());
+
+            if (!service.existsByCardNo(bankCard.getCardNo())) {
+
+
+                String imgUrl = service.upload(uuid + formart, file.getBytes());
+                service.save(bankCard);
+                returnMap.put("imgUrl", imgUrl);
+
+                relationService.save(openid, uuid, "bankcard");
+            } else {
+                //通过卡号返回UUID
+                relationService.save();
+                // 存在的话获取UUID返回路径
+                String imgUrl = service.getUrlByFileName(uuid + formart);
+                returnMap.put("imgUrl", imgUrl);
+
+            }
+            String bankCardJson = gson.toJson(bankCard);
+            Map bankCardMap = gson.fromJson(bankCardJson, Map.class);
+            returnMap.putAll(bankCardMap);
 
         } catch (IOException e) {
             e.printStackTrace();

@@ -35,7 +35,7 @@ public class CardServiceTest {
             while ((n = fis.read(b)) != -1) {
                 bos.write(b, 0, n);
             }
-            service.save("zhangbaoning",bos.toByteArray());
+            service.upload("zhangbaoning",bos.toByteArray());
         } catch (Exception e) {
             e.printStackTrace();
         }

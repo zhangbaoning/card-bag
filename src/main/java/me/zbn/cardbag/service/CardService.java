@@ -40,7 +40,7 @@ public class CardService {
     @Autowired
     private OCSUtil ocsUtil;
 
-    public String save(String openid, byte[] fileByte) {
+    public String upload(String openid, byte[] fileByte) {
         // 对openid进行MD5
         String openidMd5 = null;
         try {
@@ -81,15 +81,20 @@ public class CardService {
 
             System.out.println(BankCardOCRRequest.toJsonString(resp));
              bankCard =gson.fromJson(BankCardOCRRequest.toJsonString(resp), BankCard.class);
-            bankCardDao.save(bankCard);
-            System.out.println(bankCard.toString());
         } catch (TencentCloudSDKException e) {
             e.printStackTrace();
         }
         return bankCard;
 
     }
-    public void save(){
+    public boolean existsByCardNo(String cardNo){
+       return bankCardDao.existsById(cardNo);
+    }
+    public String getUrlByFileName(String fileName){
+        return ocsUtil.getUrl(fileName);
+    }
+    public void save(BankCard bankCard){
+        bankCardDao.save(bankCard);
 
     }
 }
