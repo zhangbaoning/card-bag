@@ -35,4 +35,10 @@ public class RelationService {
     public List<Relation> getAll(){
        return dao.findAll();
     }
+   public List getByOpenid(String openid){
+        Relation relation = new Relation();
+        relation.setOpenid(openid);
+        Example<Relation> example = Example.of(relation,ExampleMatcher.matchingAll());
+        return dao.findAll(example);
+    }
 }

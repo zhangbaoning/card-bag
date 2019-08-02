@@ -45,7 +45,7 @@ public class CardController {
 
             //  OCR获取卡号 查询卡号 是否保存
             BankCard bankCard = service.getBankOCR(file.getBytes());
-
+            // TODO 是否都存在
             if (!service.existsByCardNo(bankCard.getCardNo())) {
 
 
@@ -75,8 +75,9 @@ public class CardController {
     @GetMapping("getAllCard/{openid}")
     @ResponseBody
     public List getCardList(@PathVariable("openid") String openid) {
-        // TODO openid
-        List<Relation> relationList = relationService.getAll();
+        // 通过openid获取uuid
+        List<Relation> relationList = relationService.getByOpenid(openid);
+        //List<Relation> relationList = relationService.getAll();
         List returnList = new ArrayList();
         for (Relation relation : relationList) {
             Map relationMap = new HashMap(2);
@@ -107,5 +108,6 @@ public class CardController {
         return returnMap;
 
     }
+
 
 }
