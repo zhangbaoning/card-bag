@@ -38,7 +38,7 @@ public class RelationService {
    public List getByOpenid(String openid){
         Relation relation = new Relation();
         relation.setOpenid(openid);
-        Example<Relation> example = Example.of(relation,ExampleMatcher.matchingAll());
+        Example<Relation> example = Example.of(relation,ExampleMatcher.matchingAll().withIgnorePaths("id"));
         return dao.findAll(example);
     }
 }

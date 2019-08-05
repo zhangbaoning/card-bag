@@ -10,3 +10,4 @@ spring:
     username: root
   jpa:
     database-platform: org.hibernate.dialect.MySQL5Dialect
+    show-sql: true
