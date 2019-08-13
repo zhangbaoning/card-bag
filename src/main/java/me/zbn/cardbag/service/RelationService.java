@@ -23,6 +23,8 @@ public class RelationService {
         Relation relation = new Relation();
         relation.setOpenid(openid);
         relation.setUuid(uuid);
+        relation.setCardNo(bankNo);
+        relation.setType("bankcard");
         dao.save(relation);
     }
     public Relation getByCardNo(String cardNo){
