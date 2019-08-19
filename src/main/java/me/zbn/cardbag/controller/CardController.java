@@ -5,13 +5,11 @@ import me.zbn.cardbag.entity.BankCard;
 import me.zbn.cardbag.entity.Relation;
 import me.zbn.cardbag.service.CardService;
 import me.zbn.cardbag.service.RelationService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -76,14 +74,14 @@ public class CardController {
     @ResponseBody
     public List getCardList(@PathVariable("openid") String openid) {
         // 通过openid获取uuid
-        List<Relation> relationList = relationService.getByOpenid(openid);
+        List<Relation> relationList = relationService.getByFiled("openid",openid);
         //List<Relation> relationList = relationService.getAll();
         List returnList = new ArrayList();
         for (Relation relation : relationList) {
             Map relationMap = new HashMap(2);
             String url = service.getUrlByFileName(relation.getUuid());
-            int id = relation.getId();
-            relationMap.put("id", id);
+            String uuid = relation.getUuid();
+            relationMap.put("id", uuid);
             relationMap.put("url", url);
             relationMap.put("type", "image");
             returnList.add(relationMap);
@@ -108,6 +106,19 @@ public class CardController {
         return returnMap;
 
     }
+    @ResponseBody
+    @GetMapping("/getCardById/{uuid}")
+    public Map<String,String> getCardById(@PathVariable("uuid") String uuid){
+        Map<String,String> returnMap =  new HashMap<>(2);
+        Relation relation = null;
+        if (StringUtils.isNotBlank(uuid)){
+           relation=  relationService.getByFiled("uuid",uuid).get(0);
 
+        }
+        String imgUrl = service.getUrlByFileName(relation.getUuid());
+        returnMap.put("cardNumber",relation.getCardNo());
+        returnMap.put("imgUrl",imgUrl);
+        return returnMap;
+    }
 
 }

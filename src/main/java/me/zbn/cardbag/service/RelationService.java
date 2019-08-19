@@ -7,6 +7,7 @@ import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.stereotype.Service;
 
+import java.lang.reflect.Field;
 import java.util.List;
 
 /**
@@ -19,7 +20,8 @@ import java.util.List;
 public class RelationService {
     @Autowired
     private RelationDao dao;
-    public void save(String openid,String uuid,String bankNo,String type){
+
+    public void save(String openid, String uuid, String bankNo, String type) {
         Relation relation = new Relation();
         relation.setOpenid(openid);
         relation.setUuid(uuid);
@@ -27,20 +29,31 @@ public class RelationService {
         relation.setType("bankcard");
         dao.save(relation);
     }
-    public Relation getByCardNo(String cardNo){
+
+    public Relation getByCardNo(String cardNo) {
         Relation relation = new Relation();
         relation.setCardNo(cardNo);
 
-        Example<Relation> example = Example.of(relation,ExampleMatcher.matching().withMatcher("cardNo", ExampleMatcher.GenericPropertyMatchers.contains()));
+        Example<Relation> example = Example.of(relation, ExampleMatcher.matching().withMatcher("cardNo", ExampleMatcher.GenericPropertyMatchers.contains()));
         return dao.findOne(example).get();
     }
-    public List<Relation> getAll(){
-       return dao.findAll();
+
+    public List<Relation> getAll() {
+        return dao.findAll();
     }
-   public List getByOpenid(String openid){
+
+    public List<Relation> getByFiled(String filed, String value) {
         Relation relation = new Relation();
-        relation.setOpenid(openid);
-        Example<Relation> example = Example.of(relation,ExampleMatcher.matchingAll().withIgnorePaths("id"));
+
+        try {
+            Field relationField = Relation.class.getDeclaredField(filed);
+            relationField.setAccessible(true);
+            relationField.set(relation, value);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        Example<Relation> example = Example.of(relation, ExampleMatcher.matchingAll().withIgnorePaths("id"));
         return dao.findAll(example);
     }
 }
