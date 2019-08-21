@@ -60,6 +60,7 @@ public class CardController {
                 returnMap.put("imgUrl", imgUrl);
 
             }
+            returnMap.put("uuid",uuid);
             String bankCardJson = gson.toJson(bankCard);
             Map bankCardMap = gson.fromJson(bankCardJson, Map.class);
             returnMap.putAll(bankCardMap);
@@ -107,8 +108,8 @@ public class CardController {
 
     }
     @ResponseBody
-    @GetMapping("/getCardById/{uuid}")
-    public Map<String,String> getCardById(@PathVariable("uuid") String uuid){
+    @GetMapping("/getCardByUuid/{uuid}")
+    public Map<String,String> getCardByUuid(@PathVariable("uuid") String uuid){
         Map<String,String> returnMap =  new HashMap<>(2);
         Relation relation = null;
         if (StringUtils.isNotBlank(uuid)){
@@ -117,8 +118,32 @@ public class CardController {
         }
         String imgUrl = service.getUrlByFileName(relation.getUuid());
         returnMap.put("cardNumber",relation.getCardNo());
+        returnMap.put("uuid",relation.getUuid());
         returnMap.put("imgUrl",imgUrl);
         return returnMap;
     }
 
+    @ResponseBody
+    @DeleteMapping("/delByUuid/{uuid}")
+    public String delByUuid(@PathVariable("uuid") String uuid){
+        // 通过查询uuid删除，得到cardNO删除另一个表
+        relationService.delAllByFiled("uuid",uuid);
+        return "success";
+    }
+    @ResponseBody
+    @PutMapping("/updByUuid/{uuid}")
+    public BankCard updByUuid(@RequestParam String cardNo,String uuid){
+        BankCard bankCard  = null;
+        List<Relation> relationList = relationService.getByFiled("uuid",uuid);
+        if (relationList!=null&&relationList.size()>0){
+            Relation relation =  relationList.get(0);
+          //TODO 优化更新
+           bankCard = service.getByCardNo(relation.getCardNo());
+          service.del(bankCard);
+          bankCard.setCardNo(cardNo);
+          service.save(bankCard);
+          relation.setCardNo(cardNo);
+        }
+        return bankCard;
+    }
 }

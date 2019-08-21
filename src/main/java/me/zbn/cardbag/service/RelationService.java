@@ -56,4 +56,8 @@ public class RelationService {
         Example<Relation> example = Example.of(relation, ExampleMatcher.matchingAll().withIgnorePaths("id"));
         return dao.findAll(example);
     }
+    public  void delAllByFiled(String filed, String value){
+        List<Relation> relationList =  getByFiled(filed,value);
+        dao.deleteInBatch(relationList);
+    }
 }

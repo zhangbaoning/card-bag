@@ -5,25 +5,28 @@ import com.tencentcloudapi.common.Credential;
 import com.tencentcloudapi.common.exception.TencentCloudSDKException;
 import com.tencentcloudapi.common.profile.ClientProfile;
 import com.tencentcloudapi.common.profile.HttpProfile;
-import com.tencentcloudapi.es.v20180416.models.CosBackup;
 import com.tencentcloudapi.ocr.v20181119.OcrClient;
 import com.tencentcloudapi.ocr.v20181119.models.BankCardOCRRequest;
 import com.tencentcloudapi.ocr.v20181119.models.BankCardOCRResponse;
-import com.tencentcloudapi.ocr.v20181119.models.IDCardOCRRequest;
 import me.zbn.cardbag.dao.BankCardDao;
 import me.zbn.cardbag.dao.CardDao;
 import me.zbn.cardbag.entity.BankCard;
-import me.zbn.cardbag.utils.DESUtil;
+import me.zbn.cardbag.entity.Card;
+import me.zbn.cardbag.entity.Relation;
 import me.zbn.cardbag.utils.OCSUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Base64Utils;
 
+import java.lang.reflect.Field;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Base64;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * @author: zhangbaoning
@@ -96,6 +99,14 @@ public class CardService {
     public void save(BankCard bankCard){
         bankCardDao.save(bankCard);
 
+    }
+    public BankCard getByCardNo(String cardNo) {
+        Optional<BankCard> bankCardOptional = bankCardDao.findById(cardNo);
+      return bankCardOptional.get();
+
+    }
+    public void del(BankCard bankCard){
+        bankCardDao.delete(bankCard);
     }
 
 }
