@@ -60,7 +60,7 @@ public class CardController {
                 returnMap.put("imgUrl", imgUrl);
 
             }
-            returnMap.put("uuid",uuid);
+            returnMap.put("uuid", uuid);
             String bankCardJson = gson.toJson(bankCard);
             Map bankCardMap = gson.fromJson(bankCardJson, Map.class);
             returnMap.putAll(bankCardMap);
@@ -75,7 +75,7 @@ public class CardController {
     @ResponseBody
     public List getCardList(@PathVariable("openid") String openid) {
         // 通过openid获取uuid
-        List<Relation> relationList = relationService.getByFiled("openid",openid);
+        List<Relation> relationList = relationService.getByFiled("openid", openid);
         //List<Relation> relationList = relationService.getAll();
         List returnList = new ArrayList();
         for (Relation relation : relationList) {
@@ -92,10 +92,10 @@ public class CardController {
 
     @ResponseBody
     @GetMapping("onLogin")
-    public Map<String,Object> onLogin(String code) {
+    public Map<String, Object> onLogin(String code) {
         RestTemplate template = new RestTemplate();
         String url = "https://api.weixin.qq.com/sns/jscode2session?appid={appid}&secret={secret}&js_code={js_code}&grant_type={grant_type}";
-        Map<String,String> paramMap = new HashMap<>(4);
+        Map<String, String> paramMap = new HashMap<>(4);
         paramMap.put("js_code", code);
         paramMap.put("appid", "wx6e7ba566cdb6dcf8");
         paramMap.put("secret", "8262a066f8d262c25099aab6106f2ff7");
@@ -107,42 +107,45 @@ public class CardController {
         return returnMap;
 
     }
+
     @ResponseBody
     @GetMapping("/getCardByUuid/{uuid}")
-    public Map<String,String> getCardByUuid(@PathVariable("uuid") String uuid){
-        Map<String,String> returnMap =  new HashMap<>(2);
+    public Map<String, String> getCardByUuid(@PathVariable("uuid") String uuid) {
+        Map<String, String> returnMap = new HashMap<>(2);
         Relation relation = null;
-        if (StringUtils.isNotBlank(uuid)){
-           relation=  relationService.getByFiled("uuid",uuid).get(0);
+        if (StringUtils.isNotBlank(uuid)) {
+            relation = relationService.getByFiled("uuid", uuid).get(0);
 
         }
         String imgUrl = service.getUrlByFileName(relation.getUuid());
-        returnMap.put("cardNumber",relation.getCardNo());
-        returnMap.put("uuid",relation.getUuid());
-        returnMap.put("imgUrl",imgUrl);
+        returnMap.put("cardNumber", relation.getCardNo());
+        returnMap.put("uuid", relation.getUuid());
+        returnMap.put("imgUrl", imgUrl);
         return returnMap;
     }
 
     @ResponseBody
     @DeleteMapping("/delByUuid/{uuid}")
-    public String delByUuid(@PathVariable("uuid") String uuid){
+    public String delByUuid(@PathVariable("uuid") String uuid) {
         // 通过查询uuid删除，得到cardNO删除另一个表
-        relationService.delAllByFiled("uuid",uuid);
+        relationService.delAllByFiled("uuid", uuid);
         return "success";
     }
+
     @ResponseBody
     @PutMapping("/updByUuid/{uuid}")
-    public BankCard updByUuid(@RequestParam String cardNo,String uuid){
-        BankCard bankCard  = null;
-        List<Relation> relationList = relationService.getByFiled("uuid",uuid);
-        if (relationList!=null&&relationList.size()>0){
-            Relation relation =  relationList.get(0);
-          //TODO 优化更新
-           bankCard = service.getByCardNo(relation.getCardNo());
-          service.del(bankCard);
-          bankCard.setCardNo(cardNo);
-          service.save(bankCard);
-          relation.setCardNo(cardNo);
+    public BankCard updByUuid(@RequestParam String cardNo, String uuid) {
+        BankCard bankCard = null;
+        List<Relation> relationList = relationService.getByFiled("uuid", uuid);
+        if (relationList != null && relationList.size() > 0) {
+            Relation relation = relationList.get(0);
+            //TODO 优化更新
+            bankCard = service.getByCardNo(relation.getCardNo());
+            service.del(bankCard);
+            bankCard.setCardNo(cardNo);
+            service.save(bankCard);
+            relation.setCardNo(cardNo);
+            relationService.save(relation);
         }
         return bankCard;
     }

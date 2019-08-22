@@ -29,6 +29,9 @@ public class RelationService {
         relation.setType("bankcard");
         dao.save(relation);
     }
+    public void save(Relation relation) {
+        dao.save(relation);
+    }
 
     public Relation getByCardNo(String cardNo) {
         Relation relation = new Relation();
